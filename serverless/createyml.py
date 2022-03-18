@@ -91,7 +91,7 @@ try:
             "timer-songnumber": {
                 "cron": getEnv("DEFAULT_SONG_NUMER_CRON"),
                 "enable": True,
-                "arg": "set_song_number"
+                "arg": "用于每天0点获取刷歌数"
             }
         }
         for trigger in triggers:
@@ -109,18 +109,17 @@ try:
         f.write("  environment:\n")
         f.write("    variables:\n")
 
-        f.write("      TENCENT_SECRET_ID: " +
-                getEnv("TENCENT_SECRET_ID") + "\n")
-        f.write("      TENCENT_SECRET_KEY: " +
-                getEnv("TENCENT_SECRET_KEY") + "\n")
-        flag = False
+        vars = {}
         for env in envs:
-            if env['Key'] == 'SONG_NUMBER':
-                flag = True
-                f.write("      " + env['Key'] + ': ' + env['Value'] + "\n")
+            vars[env['Key']] = env['Value']
+        vars['TENCENT_SECRET_ID'] = getEnv("TENCENT_SECRET_ID")
+        vars['TENCENT_SECRET_KEY'] = getEnv("TENCENT_SECRET_KEY")
+        if 'SONG_NUMBER' not in vars:
+            vars['SONG_NUMBER'] = '-1'
 
-        if not flag:
-            f.write("      SONG_NUMBER: -1\n")
+        for key in vars:
+            f.write("      " + key + ': ' + vars[key] + "\n")
+
 
 except TencentCloudSDKException as err:
     print(err)
